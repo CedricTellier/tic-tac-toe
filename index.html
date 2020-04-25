@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tic Tac Toe Vue.js</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+/* CSS MINIMAL RESET*/
+html {box-sizing: border-box;font-size: 16px;}
+*, *:before, *:after {box-sizing: border-box;}
+body, h1, h2, h3, h4, h5, h6, p, ol, ul { margin: 0;padding: 0;font-weight: normal;}
+ol, ul {list-style: none;}
+img {max-width: 100%;height: auto;}
+
+body {
+      background: #111;
+      margin-top: 25px; 
+      text-align: center;
+      font-family: monospace;
+      font-size: 40px;
+      color:#eee;
+    }
+/* Mine CSS */
+  button {border-color:#eee ;background-color: #111; width:75px; height:75px; font-family: monospace; font-size: 40px;width:70px; height: 70px;}
+  button:after {content: '-'; color :transparent}
+  button.x:after {content: 'x'; color : #eee}
+  button.o:after {content: 'o'; color : #eee}
+  #game {margin-top: 25px;}
+
+  </style>
+</head>
+<body>
+  <div id="app">
+      {{ title }}
+  <div id="infos">
+    <div>
+      {{ message }}
+    </div>
+  </div>
+  <div id="game">
+    <board v-for="line in lines"
+          v-bind:key="line.id"
+          v-bind:lines="line">
+    </board>
+  </div>
+</div>
+  <script>
+    /*
+    Gameplay winning
+    xxx   ---   ---  
+    ---   xxx   ---     
+    ---   ---   xxx    
+
+    x--   -x-   --x
+    x--   -x-   --x
+    x--   -x-   --x
+
+    x--   --x
+    -x-   -x-
+    --x   x--   
+
+    bits: 
+      1, 2, 4, 
+      8, 16, 32,
+      64, 128, 256
+
+    winnig counts: 
+    [ 7, 56, 73, 82, 84, 273, 292, 448]
+    */
+    Vue.component('game_button',
+    {
+      template: '<button v-on:click="play"></button>',
+      methods: {
+        play : function({target}) {
+          target.disabled = true
+          target.setAttribute('class', app.player)
+          app.turn = !app.turn
+          app.message = app.turn ? 'Tour des Croix' : 'Tour des Ronds'
+          app.player = app.turn ? 'x' : 'o'
+          app.checkBoard()
+        }
+      }
+    })
+
+    Vue.component('board', 
+    {
+      buttons: 3,
+      props: ['lines'],
+      template: '<div><game_button v-bind:bit=lines.bit[0]></game_button><game_button v-bind:bit=lines.bit[1]></game_button><game_button v-bind:bit=lines.bit[2]></game_button></div>',
+    })
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        player:'x',
+        title: 'Tic Tac Toe!',
+        turn : true,
+        message:'Tour des croix!',
+        lines: [
+            { id: 1, bit: [1, 2, 4]},
+            { id: 2, bit: [8, 16, 32]},
+            { id: 3, bit: [64, 128, 254]}
+          ], 
+        score:  [[1, 2, 4], [8, 16, 32], [64, 128, 256], [1, 8, 64], [2, 16, 128], [4, 32, 256],[1, 16, 256], [4, 16, 64]],
+        table: []
+      },
+      methods: {
+        checkBoard : function()
+        {
+          const lDisabledBtns = document.querySelectorAll('button:disabled')
+          if(lDisabledBtns.length < 5) return
+            lDisabledBtns.forEach(function(btn)
+            {
+              if(app.table.indexOf(btn.getAttribute('bit')) === -1)
+              {
+                app.table.push([btn.getAttribute('bit'), btn.getAttribute('class')]);
+              }
+            });
+            console.log(app.table)
+            for(var i= 0; i < app.score.length ;i++)
+            {                
+              if(app.table.some(v=> app.score[i].indexOf(v) !== -1))
+              {
+                    
+                // if(lBtns.length === 3)
+                // {
+                //   var found = true;
+                //   for(var k=0; lBtns.length; k++)
+                //   {
+                //     if(lBtns.className != 'x')
+                //     {
+                //       found = false
+                //     }
+                //   }
+                //   if(found)
+                //   {
+                //     alert("winner")
+                //   }
+                // }
+                // else
+                // {
+                //   app.score.splice(app.score[i], 1);
+                // }
+              }
+            }
+        }
+      }
+    })
+  </script>
+</body>
+</html>
