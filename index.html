@@ -75,11 +75,11 @@ body {
         play : function({target}) {
           target.disabled = true
           // target.setAttribute('class', app.player)
-          // app.turn = !app.turn
-          // app.message = app.turn ? 'Tour des Croix' : 'Tour des Ronds'
+          app.turn = !app.turn
+          app.message = app.turn ? 'Tour des Ronds': 'Tour des Croix'
           // app.player = app.turn ? 'x' : 'o'
           const turn = lButtons.filter(btn => btn.className).length
-          const player = turn % 2 ? 'x' : 'o'
+          const player = turn % 2 ? 'o': 'x'
           target.className = player
           // const state = lButtons.filter(btn => btn.className === player).reduce((total, btn) => total + btn.bit, 0)
           // console.log(state)
@@ -106,7 +106,7 @@ body {
         player:'x',
         title: 'Tic Tac Toe!',
         turn : true,
-        message:'Tour des croix!',
+        message:'Tour des Croix!',
         lines: [
             { id: 1, bit: [1, 2, 4]},
             { id: 2, bit: [8, 16, 32]},
