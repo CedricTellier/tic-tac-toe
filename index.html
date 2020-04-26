@@ -20,10 +20,11 @@ body {
       color:#eee;
     }
 /* Mine CSS */
-  button {border-color:#eee ;background-color: #111; width:75px; height:75px; font-family: monospace; font-size: 40px;width:70px; height: 70px;}
+  button {border-color:#eee ;background-color: #111; width:75px; height:75px; font-family: monospace; font-size: 40px;}
   button:after {content: '-'; color :transparent}
-  button.x:after {content: 'x'; color : #eee}
-  button.o:after {content: 'o'; color : #eee}
+  button.x:after {content: 'X'; color : #eee}
+  button.o:after {content: 'O'; color : #eee}
+  button.replay {width:110px; color : #eee; height:30px; font-size: 18px;}
   #game {margin-top: 25px;}
 
   </style>
@@ -36,6 +37,8 @@ body {
         <div id="infos">
           {{ message }}
         </div>
+        <div>Points X : {{xWins}}</div>
+        <div>Points O : {{oWins}}</div>
       </div>
       <div class="column">
         <div id="game">
@@ -44,33 +47,25 @@ body {
                 v-bind:lines="line">
           </board>
         </div>
+        <div>
+          <replay_btn></replay_btn>
+        </div>
       </div>
-      <div class="column"></div>
     </div>
   </div>
   <script>
-    /*
-    Gameplay winning
-    xxx   ---   ---  
-    ---   xxx   ---     
-    ---   ---   xxx    
+    Vue.component('replay_btn', 
+    {
+      props: ['isWinner', 'gameMsg'],
+      template: '<button class="replay" v-on:click="reset">Rejouez!</button>',
+      methods: {
+        reset : function () {
+          app.isWinner = false
+          location.reload()        
+        }
+      }
+    })
 
-    x--   -x-   --x
-    x--   -x-   --x
-    x--   -x-   --x
-
-    x--   --x
-    -x-   -x-
-    --x   x--   
-
-    bits: 
-      1, 2, 4, 
-      8, 16, 32,
-      64, 128, 256
-
-    winnig counts: 
-    [ 7, 56, 73, 82, 84, 273, 292, 448]
-    */
     Vue.component('game_button',
     {
       template: '<button v-on:click="play"></button>',
@@ -83,15 +78,15 @@ body {
           target.className = player
           const check = lButtons.filter(btn => btn.className === player).reduce((total, btn) => total + parseInt(btn.getAttribute("bit")), 0)
           if(!app.winTable.some(move => (move & check) === move)) return
-          console.log(player, 'won')
-          lButtons.forEach(btn => btn.disabled = true)
+          app.isWinner = true
+          lButtons.filter(btn => btn.className !== 'replay').forEach(btn => btn.disabled = true)
+          player === 'x' ? app.xWins+=1 : app.oWins+=1
         }
       }
     })
 
     Vue.component('board', 
     {
-      buttons: 3,
       props: ['lines'],
       template: '<div><game_button v-bind:bit=lines.bit[0]></game_button><game_button v-bind:bit=lines.bit[1]></game_button><game_button v-bind:bit=lines.bit[2]></game_button></div>',
     })
@@ -100,15 +95,19 @@ body {
       el: '#app',
       data: {
         player:'x',
+        xWins: 0,
+        oWins: 0,
         title: 'Tic Tac Toe!',
         message:'Tour des Croix!',
+        gameMsg: 'Rejouer !',
         winTable : [7, 56, 448, 73, 146, 292, 273, 84],
         lines: [
             { id: 1, bit: [1, 2, 4]},
             { id: 2, bit: [8, 16, 32]},
             { id: 3, bit: [64, 128, 256]}
           ], 
-      }
+      },
+      isWinner : false,
     })
     const lButtons = [...document.querySelectorAll('button')]
   </script>
