@@ -47,25 +47,14 @@ body {
                 v-bind:lines="line">
           </board>
         </div>
-        <div>
-          <replay_btn></replay_btn>
+        <div v-if=isWinner v-if=isTieGame>
+          <div>{{ result }}</div>
+          <button class="replay"  v-on:click="reset">Rejouez!</button>
         </div>
       </div>
     </div>
   </div>
   <script>
-    Vue.component('replay_btn', 
-    {
-      props: ['isWinner', 'gameMsg'],
-      template: '<button class="replay" v-on:click="reset">Rejouez!</button>',
-      methods: {
-        reset : function () {
-          app.isWinner = false
-          location.reload()        
-        }
-      }
-    })
-
     Vue.component('game_button',
     {
       template: '<button v-on:click="play"></button>',
@@ -77,10 +66,19 @@ body {
           const player = turn % 2 ? 'o': 'x'
           target.className = player
           const check = lButtons.filter(btn => btn.className === player).reduce((total, btn) => total + parseInt(btn.getAttribute("bit")), 0)
-          if(!app.winTable.some(move => (move & check) === move)) return
-          app.isWinner = true
-          lButtons.filter(btn => btn.className !== 'replay').forEach(btn => btn.disabled = true)
-          player === 'x' ? app.xWins+=1 : app.oWins+=1
+          console.log(check)
+          if(!app.winTable.some(move => (move & check) === move) & lButtons.filter(btn => btn.disabled).length !== 9) return
+          if(lButtons.filter(btn => btn.disabled).length === 9)
+          {
+            app.isWinner = true
+            app.result = 'Match nul!'
+          }
+          else{
+            app.isWinner = true
+            app.result = player === 'x' ? 'Victoire des X!' : 'Victoire des O!'
+            lButtons.filter(btn => btn.className !== 'replay').forEach(btn => btn.disabled = true)
+            player === 'x' ? app.xWins+=1 : app.oWins+=1
+          }
         }
       }
     })
@@ -94,12 +92,15 @@ body {
     var app = new Vue({
       el: '#app',
       data: {
+        isWinner : false,
+        isTieGame: false,
         player:'x',
         xWins: 0,
         oWins: 0,
         title: 'Tic Tac Toe!',
         message:'Tour des Croix!',
         gameMsg: 'Rejouer !',
+        result: 'Undefined',
         winTable : [7, 56, 448, 73, 146, 292, 273, 84],
         lines: [
             { id: 1, bit: [1, 2, 4]},
@@ -107,7 +108,13 @@ body {
             { id: 3, bit: [64, 128, 256]}
           ], 
       },
-      isWinner : false,
+      methods: {
+        reset : function () {
+          app.isWinner = false
+          lButtons.filter(btn => btn.className !== 'replay').forEach(btn => btn.classList.remove('x', 'o') & btn.removeAttribute('disabled')
+          )
+        }
+      }
     })
     const lButtons = [...document.querySelectorAll('button')]
   </script>
