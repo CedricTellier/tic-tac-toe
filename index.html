@@ -5,11 +5,11 @@
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <style>
 /* CSS MINIMAL RESET*/
-html {box-sizing: border-box;font-size: 16px;}
+/* html {box-sizing: border-box;font-size: 16px;}
 *, *:before, *:after {box-sizing: border-box;}
 body, h1, h2, h3, h4, h5, h6, p, ol, ul { margin: 0;padding: 0;font-weight: normal;}
 ol, ul {list-style: none;}
-img {max-width: 100%;height: auto;}
+img {max-width: 100%;height: auto;} */
 
 body {
       background: #111;
@@ -19,6 +19,16 @@ body {
       font-size: 40px;
       color:#eee;
     }
+.row {
+  margin-top: 25px;
+  display: flex;
+}
+
+/* Create two equal columns that sits next to each other */
+.column {
+  flex: 50%;
+  padding: 10px;
+}
 /* Mine CSS */
   button {border-color:#eee ;background-color: #111; width:75px; height:75px; font-family: monospace; font-size: 40px;}
   button:after {content: '-'; color :transparent}
@@ -30,31 +40,31 @@ body {
   </style>
 </head>
 <body>
-  <div class="row">
     <div id="app">
       {{ title }}
-      <div class="column">
-        <div id="infos">
-          {{ message }}
-        </div>
-        <div>Points X : {{xWins}}</div>
-        <div>Points O : {{oWins}}</div>
+      <div class="row">
+        <div class="column" style="margin-top: 50px;">
+          <div style="border-style: solid; border-radius: 5%; border-color: #eee;"> 
+            <div>Points X : {{xWins}}</div>
+            <div>Points O : {{oWins}}</div>
+            <div id="infos">{{ message }}</div>
+            <div id="clock" style="font-size: 25pxs;">02:00</div>
+
+          </div>
       </div>
-      <div class="column">
-        <div id="game">
-          <board v-for="line in lines"
-                v-bind:key="line.id"
-                v-bind:lines="line">
-          </board>
-        </div>
-        <div v-if=isWinner v-if=isTieGame>
-          <div>{{ result }}</div>
-          <button class="replay"  v-on:click="reset">Rejouez!</button>
+        <div class="column">
+          <div id="game">
+            <board v-for="line in lines" v-bind:key="line.id" v-bind:lines="line">
+            </board>
+          </div>
+          <div v-if=isWinner v-if=isTieGame>
+            <div>{{ result }}</div>
+            <button class="replay" v-on:click="reset">Rejouez!</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <script>
+    <script>
     Vue.component('game_button',
     {
       template: '<button v-on:click="play"></button>',
