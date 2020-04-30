@@ -45,11 +45,10 @@ body {
       <div class="row">
         <div class="column" style="margin-top: 50px;">
           <div style="border-style: solid; border-radius: 5%; border-color: #eee;"> 
-            <div>Points X : {{xWins}}</div>
-            <div>Points O : {{oWins}}</div>
+            <div>Points X : {{ xWins }}</div>
+            <div>Points O : {{ oWins }}</div>
             <div id="infos">{{ message }}</div>
-            <div id="clock" style="font-size: 25pxs;">02:00</div>
-
+            <div id="clock" style="font-size: 25pxs;">Timer {{ hours }}:{{ minutes }}:{{ seconds }}</div>
           </div>
       </div>
         <div class="column">
@@ -65,18 +64,19 @@ body {
       </div>
     </div>
     <script>
+
     Vue.component('game_button',
     {
       template: '<button v-on:click="play"></button>',
       methods: {
-        play : function({target}) {
+        play : ({target}) => {
           target.disabled = true
+          const lButtons = [...document.querySelectorAll('button')]
           const turn = lButtons.filter(btn => btn.className).length
           app.message = turn % 2 ? 'Tour des Croix' : 'Tour des Ronds'
           const player = turn % 2 ? 'o': 'x'
           target.className = player
           const check = lButtons.filter(btn => btn.className === player).reduce((total, btn) => total + parseInt(btn.getAttribute("bit")), 0)
-          console.log(check)
           if(!app.winTable.some(move => (move & check) === move) & lButtons.filter(btn => btn.disabled).length !== 9) return
           if(lButtons.filter(btn => btn.disabled).length === 9)
           {
@@ -102,6 +102,10 @@ body {
     var app = new Vue({
       el: '#app',
       data: {
+        time: 0,
+        seconds: '00',
+        minutes: '00',
+        hours: '00',
         isWinner : false,
         isTieGame: false,
         player:'x',
@@ -119,14 +123,24 @@ body {
           ], 
       },
       methods: {
-        reset : function () {
+        reset : () => {
           app.isWinner = false
+          const lButtons = [...document.querySelectorAll('button')]
           lButtons.filter(btn => btn.className !== 'replay').forEach(btn => btn.classList.remove('x', 'o') & btn.removeAttribute('disabled')
           )
+        },
+        launchTimer : () => {
+            app.time+=1
+            const calcSec = app.time % 60
+            const calcMin = Math.floor(app.time / 60)
+            const calcHou = Math.floor(app.time / 60 / 60)
+            app.seconds = calcSec > 9 ?  calcSec : '0' + calcSec
+            app.minutes = calcMin > 9? calcMin : '0' + calcMin
+            app.hours = calcHou > 9? calcHou : '0' + calcHou
         }
       }
     })
-    const lButtons = [...document.querySelectorAll('button')]
+    setInterval(app.launchTimer, 1000)
   </script>
 </body>
 </html>
